@@ -1,0 +1,82 @@
+@inject IHttpClientFactory HttpClientFactory
+
+<InputFile OnChange="OnInputFileChange" />
+<div>
+    <input @bind="Title" placeholder="Title" />
+    <select @bind="Category">
+        <option>Project Documents</option>
+        <option>Team Resources</option>
+        <option>Personal Files</option>
+        <option>Reports</option>
+        <option>Presentations</option>
+        <option>Other</option>
+    </select>
+    <button type="button" @onclick="UploadAsync" disabled="@isUploading">@(isUploading ? "Uploading..." : "Upload")</button>
+</div>
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <p role="status">@statusMessage</p>
+}
+
+@code {
+    [Parameter]
+    public EventCallback OnUploaded { get; set; }
+
+    private IBrowserFile? selectedFile;
+    private string Title { get; set; } = string.Empty;
+    private string Category { get; set; } = "Project Documents";
+    private string statusMessage = string.Empty;
+    private bool isUploading;
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task UploadAsync()
+    {
+        if (selectedFile == null)
+        {
+            statusMessage = "Select a file before uploading.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            statusMessage = "Enter a title before uploading.";
+            return;
+        }
+
+        isUploading = true;
+        statusMessage = string.Empty;
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient();
+            using var content = new MultipartFormDataContent();
+            using var stream = selectedFile.OpenReadStream(25 * 1024 * 1024);
+            using var streamContent = new StreamContent(stream);
+            content.Add(streamContent, "file", selectedFile.Name);
+            content.Add(new StringContent(Title), "title");
+            content.Add(new StringContent(Category), "category");
+
+            var response = await client.PostAsync("/api/documents/upload", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Upload failed: {await response.Content.ReadAsStringAsync()}";
+                return;
+            }
+
+            statusMessage = "Document uploaded successfully.";
+            await OnUploaded.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Upload failed: {ex.Message}";
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+}

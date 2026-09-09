@@ -1,0 +1,62 @@
+@page "/documents"
+@inject IHttpClientFactory HttpClientFactory
+@using System.Net.Http.Json
+
+<h3>My Documents</h3>
+<_DocumentUpload OnUploaded="LoadDocuments" />
+
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Uploaded</th>
+            <th>Size</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in documents)
+        {
+            <tr>
+                <td>@d.Title</td>
+                <td>@d.Category</td>
+                <td>@d.UploadDateUtc</td>
+                <td>@d.FileSizeBytes</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<DocumentDto> documents = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDocuments();
+    }
+
+    private async Task LoadDocuments()
+    {
+        var client = HttpClientFactory.CreateClient();
+        var resp = await client.GetFromJsonAsync<DocumentListResponse>("/api/documents/my");
+        if (resp?.items != null)
+        {
+            documents = resp.items;
+        }
+    }
+
+    private class DocumentDto
+    {
+        public int DocumentId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public DateTime UploadDateUtc { get; set; }
+        public long FileSizeBytes { get; set; }
+    }
+
+    private class DocumentListResponse
+    {
+        public List<DocumentDto>? items { get; set; }
+        public int total { get; set; }
+    }
+}

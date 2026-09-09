@@ -2,34 +2,34 @@
 
 Phase 1 — Setup
 
-- [ ] T001 [P] Create feature folder scaffolding and add plan/spec artifacts in `specs/001-document-upload-management`
-- [ ] T002 Initialize local uploads directory and configuration entry in `appsettings.json` (e.g., `FileStorage:LocalPath`)
-- [ ] T003 [P] Add dependency registration for storage abstraction in `Program.cs` (DI placeholder)
-- [ ] T004 Create database migration scaffold for `Documents` table in `Data/Migrations/` (EF migration)
+- [x] T001 [P] Create feature folder scaffolding and add plan/spec artifacts in `specs/001-document-upload-management`
+- [x] T002 Initialize local uploads directory and configuration entry in `appsettings.json` (e.g., `FileStorage:LocalPath`)
+- [x] T003 [P] Add dependency registration for storage abstraction in `Program.cs` (DI placeholder)
+- [x] T004 Create database migration scaffold for `Documents` table in `Data/Migrations/` (EF migration)
 
 Phase 2 — Foundational (blocking prerequisites)
 
-- [ ] T005 Implement `Data/Document.cs` entity and add `DbSet<Document>` to `Data/ApplicationDbContext.cs`
-- [ ] T006 [P] Add data model validation attributes in `Data/Document.cs` (title length, required category, max file size constraint constant)
-- [ ] T007 Implement storage abstraction interface in `Services/IFileStorageService.cs`
-- [ ] T008 Implement local storage backend `Services/LocalFileStorageService.cs` (save/delete/download semantics, path generation)
-- [ ] T009 Implement audit logging for document actions in `Services/DocumentAuditService.cs` (or integrate into `DocumentService`)
-- [ ] T010 Create `Services/DocumentService.cs` with orchestrated upload workflow (validate, authorize, store file, save metadata, emit audit + notifications)
-- [ ] T011 Add unit test project tests/DocumentService.UnitTests for core business logic
+- [x] T005 Implement `Data/Document.cs` entity and add `DbSet<Document>` to `Data/ApplicationDbContext.cs`
+- [x] T006 [P] Add data model validation attributes in `Data/Document.cs` (title length, required category, max file size constraint constant)
+- [x] T007 Implement storage abstraction interface in `Services/IFileStorageService.cs`
+- [x] T008 Implement local storage backend `Services/LocalFileStorageService.cs` (save/delete/download semantics, path generation)
+- [x] T009 Implement audit logging for document actions in `Services/DocumentAuditService.cs` (or integrate into `DocumentService`)
+- [x] T010 Create `Services/DocumentService.cs` with orchestrated upload workflow (validate, authorize, store file, save metadata, emit audit + notifications)
+- [x] T011 Add unit test project tests/DocumentService.UnitTests for core business logic
 
 Phase 3 — User Story US1 (Upload Document) (Priority: P1)
 
-- [ ] T012 [US1] [P] Implement upload API endpoint `Controllers/DocumentsController.UploadAsync` (route: `POST /api/documents/upload`)
-- [ ] T013 [US1] Implement client upload component `_DocumentUpload.razor` and `Pages/Documents.razor` UI hooks
-- [ ] T014 [US1] Implement server-side validation (file type whitelist, size limit) in `Services/DocumentService.cs`
-- [ ] T015 [US1] Integrate virus-scan stub or ClamAV hook in `Services/Scanning/IVirusScanner.cs` and tests
-- [ ] T016 [US1] Add integration tests tests/DocumentService.IntegrationTests for successful upload and rejected uploads (size/type)
+- [x] T012 [US1] [P] Implement upload API endpoint `Controllers/DocumentsController.UploadAsync` (route: `POST /api/documents/upload`)
+- [x] T013 [US1] Implement client upload component `_DocumentUpload.razor` and `Pages/Documents.razor` UI hooks
+- [x] T014 [US1] Implement server-side validation (file type whitelist, size limit) in `Services/DocumentService.cs`
+- [x] T015 [US1] Integrate virus-scan stub or ClamAV hook in `Services/Scanning/IVirusScanner.cs` and tests
+- [x] T016 [US1] Add integration tests tests/DocumentService.IntegrationTests for successful upload and rejected uploads (size/type)
 
 Phase 4 — User Story US2 (Browse & Search) (Priority: P1)
 
-- [ ] T017 [US2] Implement `GET /api/documents/my` endpoint in `Controllers/DocumentsController.cs` with paging, sorting, filtering
-- [ ] T018 [US2] Implement front-end `Pages/Documents.razor` listing with sort/filter UI and search input
-- [ ] T019 [US2] Add unit/integration tests for listing/search performance and authorization
+- [x] T017 [US2] Implement `GET /api/documents/my` endpoint in `Controllers/DocumentsController.cs` with paging, sorting, filtering
+- [x] T018 [US2] Implement front-end `Pages/Documents.razor` listing with sort/filter UI and search input
+- [x] T019 [US2] Add unit/integration tests for listing/search performance and authorization
 
 Phase 5 — User Story US3 (Project Documents & Sharing) (Priority: P2)
 
