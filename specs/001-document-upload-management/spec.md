@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: "StakeholderDocs/document-upload-and-management-feature.md"
 
+## Clarifications
+
+### Session 2026-09-10
+
+- Q: For deleted documents, should the system permanently remove files immediately, use a soft-delete retention window, or archive them for compliance retention? → A: Option A — Permanent delete immediately (remove file + metadata).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Upload Document (Priority: P1)
@@ -82,7 +88,7 @@ Users can preview common file types in-browser, download allowed files, edit met
 - **FR-007**: System MUST support viewing "My Documents", Project Documents, and "Shared with Me" lists with sort and filter capabilities.
 - **FR-008**: System MUST provide search by title, description, tags, uploader name, and associated project; results must respect authorization rules.
 - **FR-009**: System MUST allow document owners to edit metadata and replace the binary file; replacing must preserve references and update stored metadata.
-- **FR-010**: System MUST allow document owners or authorized project managers to delete documents; delete must remove both storage and metadata.
+- **FR-010**: System MUST allow document owners or authorized project managers to delete documents; upon user confirmation the system MUST permanently remove both storage and metadata immediately.
 - **FR-011**: System MUST emit audit logs for uploads, downloads, shares, edits, and deletions for reporting and compliance.
 - **FR-012**: System MUST define a storage abstraction layer so implementations can be swapped (local filesystem for training, cloud blob storage for production) without changing business logic.
 
