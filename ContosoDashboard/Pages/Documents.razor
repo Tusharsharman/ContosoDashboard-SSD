@@ -5,6 +5,42 @@
 <h3>My Documents</h3>
 <_DocumentUpload OnUploaded="LoadDocuments" />
 
+<div>
+    <label>
+        Search
+        <input @bind="searchText" @bind:event="oninput" placeholder="Search title, description, or tags" />
+    </label>
+    <label>
+        Category
+        <select @bind="selectedCategory">
+            <option value="">All categories</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category">@category</option>
+            }
+        </select>
+    </label>
+    <label>
+        Project ID
+        <input type="number" @bind="projectIdFilter" placeholder="Any project" />
+    </label>
+    <label>
+        Sort by
+        <select @bind="sortField">
+            <option value="date">Upload date</option>
+            <option value="title">Title</option>
+            <option value="size">File size</option>
+        </select>
+    </label>
+    <label>
+        Direction
+        <select @bind="sortDescending">
+            <option value="true">Descending</option>
+            <option value="false">Ascending</option>
+        </select>
+    </label>
+</div>
+
 <table>
     <thead>
         <tr>
@@ -12,16 +48,18 @@
             <th>Category</th>
             <th>Uploaded</th>
             <th>Size</th>
+            <th>Project</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var d in documents)
+        @foreach (var d in FilteredDocuments)
         {
             <tr>
                 <td>@d.Title</td>
                 <td>@d.Category</td>
                 <td>@d.UploadDateUtc</td>
                 <td>@d.FileSizeBytes</td>
+                <td>@(d.ProjectId?.ToString() ?? "-")</td>
             </tr>
         }
     </tbody>
@@ -29,6 +67,58 @@
 
 @code {
     private List<DocumentDto> documents = new();
+    private string searchText = string.Empty;
+    private string selectedCategory = string.Empty;
+    private int? projectIdFilter;
+    private string sortField = "date";
+    private bool sortDescending = true;
+
+    private IEnumerable<string> categories => documents
+        .Select(d => d.Category)
+        .Where(category => !string.IsNullOrWhiteSpace(category))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(category => category);
+
+    private IEnumerable<DocumentDto> FilteredDocuments
+    {
+        get
+        {
+            var query = documents.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                query = query.Where(d =>
+                    d.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    (d.Description?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (d.Tags?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false));
+            }
+
+            if (!string.IsNullOrWhiteSpace(selectedCategory))
+            {
+                query = query.Where(d => string.Equals(d.Category, selectedCategory, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (projectIdFilter.HasValue)
+            {
+                query = query.Where(d => d.ProjectId == projectIdFilter.Value);
+            }
+
+            query = sortField switch
+            {
+                "title" => sortDescending
+                    ? query.OrderByDescending(d => d.Title)
+                    : query.OrderBy(d => d.Title),
+                "size" => sortDescending
+                    ? query.OrderByDescending(d => d.FileSizeBytes)
+                    : query.OrderBy(d => d.FileSizeBytes),
+                _ => sortDescending
+                    ? query.OrderByDescending(d => d.UploadDateUtc)
+                    : query.OrderBy(d => d.UploadDateUtc)
+            };
+
+            return query;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,9 +139,12 @@
     {
         public int DocumentId { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public string Category { get; set; } = string.Empty;
+        public string? Tags { get; set; }
         public DateTime UploadDateUtc { get; set; }
         public long FileSizeBytes { get; set; }
+        public int? ProjectId { get; set; }
     }
 
     private class DocumentListResponse
